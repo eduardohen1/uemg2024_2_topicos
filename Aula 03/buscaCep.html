@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca CEP</title>
+    <script>
+        //função para aplicar a mascara de CEP
+        function applyCepMask(value){
+            //retirar caracteres não numéricos
+            value = value.replace(/\D/g, ''); //remove tudo q não é número
+            //aplicar a máscara
+            value = value.replace(/^(\d{5})(\d{3}).*/, '$1-$2'); //aplica a máscara
+            value = value.slice(0, 9); //limita o tamanho do cep para 9 caracteres
+            return value;
+        }
+        //função para formatar o campo de input conforme o usuário digita
+        function formatCepField(event){
+            //capturar o valor do campo
+            let value = event.target.value;
+            //aplicar a máscara
+            value = applyCepMask(value);
+            //atualizar o valor do campo
+            event.target.value = value;
+        }
+
+        //função para enviar a requisição ao ViaCEP
+        function sendRequest(){
+            const cep = document.getElementById('txtCep').value.replace('-', '');
+            if(cep.length != 8){
+                alert('CEP inválido');
+                return;
+            }
+            //Fazendo a requisição à API ViaCEP
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then(data => {
+                    if(data.erro){
+                        document.getElementById('resultado').innerHTML = 'CEP não encontrado';
+                    }else{
+                        document.getElementById('resultado').innerHTML = `
+                            <p>CEP: ${data.cep}</p>
+                            <p>Logradouro: ${data.logradouro}</p>
+                            <p>Complemento: ${data.complemento}</p>
+                            <p>Bairro: ${data.bairro}</p>
+                            <p>Cidade: ${data.localidade}</p>
+                            <p>Estado: ${data.uf}</p>
+                        `;
+                    }
+                }).catch((error) => {
+                    document.getElementById('resultado').innerHTML = 'Erro ao enviar requisição';
+                });
+        }
+        //função para limpar div
+        function limpar(){
+            document.getElementById('resultado').innerHTML = '';
+            document.getElementById('txtCep').value = '';
+        }
+    </script>
+</head>
+<body>
+    <h1>Simulação de Cliente e Servidor com CEP</h1>
+    <div>
+        <div>
+            <label for="txtCep">CEP:</label>
+            <input type="text" id="txtCep" oninput="formatCepField(event)" maxlength="9" placeholder="00000-000">            
+        </div>
+        <div id="resultado"></div>
+        <div>
+            <button onclick="sendRequest()">Buscar CEP</button>
+            <button onclick="limpar()">Limpar</button>
+        </div>
+    </div>    
+
+</body>
+</html>

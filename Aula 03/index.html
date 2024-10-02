@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação Cliente-Servidor</title>
+</head>
+<body>
+    <h1>Simulação de Cliente/Servidor</h1>
+
+    <button id="btnEnviar">Enviar Requisição</button>&nbsp;
+    <button id="btnLimpar">Limpar</button>
+    <div id="resultado"></div>
+
+    <script>
+        //Simular servidor real
+        function simulateServer() {
+            return new Promise((resolve, reject) => {
+                const data = {
+                    status: 200,
+                    message: 'OK',
+                    data: {
+                        nome: 'Fulano de Tal',
+                        idade: 30,
+                        email: ''
+                    }
+                };
+                setTimeout(() => {
+                    resolve(data);
+                }, 1000);
+            });
+        }
+
+        //Função para enviar requisição
+        function enviarRequisicao() {
+            document.getElementById('resultado').innerHTML = 'Carregando...';
+
+            simulateServer().then((data) => {
+                document.getElementById('resultado').innerHTML = JSON.stringify(data);
+            }).catch((error) => {
+                document.getElementById('resultado').innerHTML = 'Erro ao enviar requisição';
+            });
+        }
+
+        //adicionar evento de clique no botão
+        document.getElementById('btnEnviar').addEventListener('click', enviarRequisicao);
+        //adicionar evento de clique no botão
+        document.getElementById('btnLimpar').addEventListener('click', () => {
+            document.getElementById('resultado').innerHTML = '';
+        });
+    </script>
+</body>
+</html>
